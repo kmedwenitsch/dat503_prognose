@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 
 from sklearn.gaussian_process import GaussianProcessRegressor
 from sklearn.gaussian_process.kernels import RBF, ConstantKernel as C, WhiteKernel
-from sklearn.metrics import mean_absolute_error, mean_squared_error
+from sklearn.metrics import mean_absolute_error, mean_absolute_percentage_error, root_mean_squared_error
 
 # Daten aus Inputdatei einlesen und in DataFrame speichern
 csv_path = "input_data/HPIMesszahlen.csv"
@@ -62,12 +62,12 @@ y_pred_test, y_std_test = gpr.predict(X_test, return_std=True)
 
 # Erhebung der Metriken MAE, MSE und RMSE
 mae = mean_absolute_error(y_test, y_pred_test)
-mse = mean_squared_error(y_test, y_pred_test, squared=True)
-rmse = mean_squared_error(y_test, y_pred_test, squared=False)
+rmse = root_mean_squared_error(y_test, y_pred_test)
+mape = mean_absolute_percentage_error(y_test, y_pred_test)
 
 print(f"MAE (Test):  {mae:.2f}")
-print(f"MSE (Test): {mse:.2f}")
 print(f"RMSE (Test): {rmse:.2f}")
+print(f"MAPE (Test): {mape:.2f}")
 
 # Prognose der nächsten 4 Quartale
 
@@ -125,4 +125,6 @@ plt.title("Prognose des österreichischen Häuserpreisindex mit Gaussian Process
 plt.legend()
 plt.grid(True)
 plt.tight_layout()
+plt.savefig("gpr_prognose.png")
 plt.show()
+
