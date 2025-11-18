@@ -11,6 +11,13 @@ csv_path = "input_data/HPIMesszahlen.csv"
 df = pd.read_csv(csv_path, delimiter=";")
 time_col = "Quartal"
 value_col = "HPI"
-
 print(df.head())
-print(df.tail())
+
+# Umwandlung Quartalsbezeichnungen in fortlaufende Nummerierung
+df["t"] = np.arange(len(df))
+
+# Definition Zeitreihe X und Zielvariable y
+X = df[["t"]].values
+y = df[value_col].values
+print("Anzahl vorhandene Werte:", len(df))
+
