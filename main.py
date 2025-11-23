@@ -35,28 +35,27 @@ y_test = y[n_train:]
 # Definition GPR Modell
 
 # Kernel-Definition:
-# C: Signalvarianz
-# RBF: glatte Funktion mit bestimmter Länge-Skala
-# WhiteKernel: Beobachtungsrauschen
+# C: = Signalvarianz
+# RBF = glatte Funktion mit bestimmter Länge-Skala
+# WhiteKernel = Beobachtungsrauschen
+
 kernel = C(1.0, (1e-3, 1e3)) * RBF(length_scale=10.0, length_scale_bounds=(1.0, 1e3)) \
          + WhiteKernel(noise_level=1.0, noise_level_bounds=(1e-5, 1e1))
 
 gpr = GaussianProcessRegressor(
     kernel=kernel,
-    alpha=0.0,             # wird durch WhiteKernel abgedeckt
-    n_restarts_optimizer=10,  # mehrere Starts zur besseren Kernelanpassung
-    normalize_y=True,      # Ausgangsdaten normalisieren
+    alpha=0.0,
+    n_restarts_optimizer=10,
+    normalize_y=True,
     random_state=42
 )
 
 # Modell trainieren
 gpr.fit(X_train, y_train)
 
-print("Optimierter Kernel:", gpr.kernel_)
-
 # Prognose auf Training UND Testdaten
 
-# Vorhersage + Unsicherheit (Standardabweichung) auf Training und Test
+# Vorhersage + Unsicherheit/Standardabweichung auf Trainings- und Testdaten
 y_pred_train, y_std_train = gpr.predict(X_train, return_std=True)
 y_pred_test, y_std_test = gpr.predict(X_test, return_std=True)
 
@@ -88,19 +87,19 @@ for t_val, y_hat, y_sd in zip(t_future, y_pred_future, y_std_future):
 
 plt.figure(figsize=(10, 6))
 
-# Gesamte Zeitachse für Visualisierung
+# Zeitachse für Visualisierung
 t_all = df["t"].values
 
-# GPR-Prognose und Unsicherheit auf allen bekannten Punkten
+# GPR-Prognose inkl. Unsicherheit auf allen bekannten Punkten
 y_pred_all, y_std_all = gpr.predict(X, return_std=True)
 
 # Historische Daten
 plt.plot(t_all, y, label="Historischer HPI", marker="o")
 
-# GPR-Vorhersage auf historischer Periode
+# GPR-Vorhersage auf historischen Daten
 plt.plot(t_all, y_pred_all, label="GPR-Prognse (In-Sample)", linestyle="--")
 
-# Unsicherheitsband (95%-Intervall)
+# Unsicherheit (95%-Konfidenzintervall)
 plt.fill_between(
     t_all,
     y_pred_all - 1.96 * y_std_all,
@@ -109,7 +108,7 @@ plt.fill_between(
     label="95%-Konfidenzintervall (In-Sample)"
 )
 
-# Zukunftspunkte
+# Zukunftsprognose
 plt.plot(t_future, y_pred_future, label="GPR-Prognose (Zukunft)", marker="x", linestyle="-")
 plt.fill_between(
     t_future,
@@ -119,7 +118,7 @@ plt.fill_between(
     label="95%-Konfidenzintervall (Zukunft)"
 )
 
-plt.xlabel("Zeitindex (Quartale)")
+plt.xlabel("Zeitindex (in Quartalen)")
 plt.ylabel("HPI")
 plt.title("Prognose des österreichischen Häuserpreisindex mit Gaussian Process Regression")
 plt.legend()
